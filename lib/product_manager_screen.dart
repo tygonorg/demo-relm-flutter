@@ -106,7 +106,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                 if (name.isNotEmpty) {
                   widget.realm.write(() {
                     widget.realm.add(Product(ObjectId(), name, price,
-                        desc.isNotEmpty ? desc : null));
+                        description: desc.isNotEmpty ? desc : null));
                   });
                   Navigator.of(context).pop();
                 }
