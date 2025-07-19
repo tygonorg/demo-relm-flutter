@@ -4,8 +4,8 @@ import 'user_manager_screen.dart'; // Import the new screen
 import 'package:realm/realm.dart';
 
 class HomeScreen extends StatelessWidget {
-  final Realm? realm;
-  const HomeScreen({Key? key, this.realm}) : super(key: key);
+  final Realm realm;
+  const HomeScreen({Key? key, required this.realm}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProductManagerScreen(realm: realm!),
+                    builder: (context) => ProductManagerScreen(realm: realm),
                   ),
                 );
               },
@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UserManagerScreen(realm: realm!),
+                    builder: (context) => UserManagerScreen(realm: realm),
                   ),
                 );
               },

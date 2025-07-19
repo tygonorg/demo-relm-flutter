@@ -46,10 +46,29 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        widget.realm.write(() {
-                          widget.realm.delete(product);
-                        });
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Xác nhận xoá'),
+                            content: const Text('Bạn có chắc muốn xoá sản phẩm này?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(false),
+                                child: const Text('Huỷ'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(true),
+                                child: const Text('Xoá'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true) {
+                          widget.realm.write(() {
+                            widget.realm.delete(product);
+                          });
+                        }
                       },
                     ),
                   ],

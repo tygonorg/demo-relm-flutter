@@ -8,4 +8,5 @@ class _MyUser {
   late ObjectId id;
 
   late String name;
+  String? email;
 }
