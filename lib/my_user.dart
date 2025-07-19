@@ -1,6 +1,6 @@
 import 'package:realm/realm.dart';
 
-part 'my_user.g.dart';
+part 'my_user.realm.dart';
 
 @RealmModel()
 class _MyUser {
@@ -8,4 +8,5 @@ class _MyUser {
   late ObjectId id;
 
   late String name;
+  String? email;
 }

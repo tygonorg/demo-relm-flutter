@@ -1,30 +1,31 @@
+
 import 'package:flutter/material.dart';
 import 'package:realm/realm.dart';
-import 'product.dart';
+import 'my_user.dart';
 
-class ProductManagerScreen extends StatefulWidget {
+class UserManagerScreen extends StatefulWidget {
   final Realm realm;
-  const ProductManagerScreen({Key? key, required this.realm}) : super(key: key);
+  const UserManagerScreen({Key? key, required this.realm}) : super(key: key);
 
   @override
-  State<ProductManagerScreen> createState() => _ProductManagerScreenState();
+  State<UserManagerScreen> createState() => _UserManagerScreenState();
 }
 
-class _ProductManagerScreenState extends State<ProductManagerScreen> {
-  late final RealmResults<Product> _products;
+class _UserManagerScreenState extends State<UserManagerScreen> {
+  late final RealmResults<MyUser> _users;
 
   @override
   void initState() {
     super.initState();
-    _products = widget.realm.all<Product>();
+    _users = widget.realm.all<MyUser>();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Quản lý sản phẩm')),
-      body: StreamBuilder<RealmResultsChanges<Product>>(
-        stream: _products.changes,
+      appBar: AppBar(title: const Text('Quản lý người dùng')),
+      body: StreamBuilder<RealmResultsChanges<MyUser>>(
+        stream: _users.changes,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -33,16 +34,15 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
           return ListView.builder(
             itemCount: results.length,
             itemBuilder: (context, index) {
-              final product = results[index];
+              final user = results[index];
               return ListTile(
-                title: Text(product.name),
-                subtitle: Text('Giá: ${product.price}'),
+                title: Text(user.name),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit),
-                      onPressed: () => _showEditProductDialog(context, product),
+                      onPressed: () => _showEditUserDialog(context, user),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete),
@@ -51,7 +51,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                           context: context,
                           builder: (context) => AlertDialog(
                             title: const Text('Xác nhận xoá'),
-                            content: const Text('Bạn có chắc muốn xoá sản phẩm này?'),
+                            content: const Text('Bạn có chắc muốn xoá người dùng này?'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.of(context).pop(false),
@@ -66,7 +66,7 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
                         );
                         if (confirm == true) {
                           widget.realm.write(() {
-                            widget.realm.delete(product);
+                            widget.realm.delete(user);
                           });
                         }
                       },
@@ -79,38 +79,22 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddProductDialog(context),
+        onPressed: () => _showAddUserDialog(context),
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  void _showAddProductDialog(BuildContext context) {
+  void _showAddUserDialog(BuildContext context) {
     final nameController = TextEditingController();
-    final priceController = TextEditingController();
-    final descController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Thêm sản phẩm'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Tên sản phẩm'),
-              ),
-              TextField(
-                controller: priceController,
-                decoration: const InputDecoration(labelText: 'Giá'),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: descController,
-                decoration: const InputDecoration(labelText: 'Mô tả'),
-              ),
-            ],
+          title: const Text('Thêm người dùng'),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'Tên người dùng'),
           ),
           actions: [
             TextButton(
@@ -120,12 +104,9 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
             TextButton(
               onPressed: () {
                 final name = nameController.text;
-                final price = double.tryParse(priceController.text) ?? 0;
-                final desc = descController.text;
                 if (name.isNotEmpty) {
                   widget.realm.write(() {
-                    widget.realm.add(Product(ObjectId(), name, price,
-                        description: desc.isNotEmpty ? desc : null));
+                    widget.realm.add(MyUser(ObjectId(), name));
                   });
                   Navigator.of(context).pop();
                 }
@@ -138,34 +119,16 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
     );
   }
 
-  void _showEditProductDialog(BuildContext context, Product product) {
-    final nameController = TextEditingController(text: product.name);
-    final priceController =
-        TextEditingController(text: product.price.toString());
-    final descController =
-        TextEditingController(text: product.description ?? '');
+  void _showEditUserDialog(BuildContext context, MyUser user) {
+    final nameController = TextEditingController(text: user.name);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Sửa sản phẩm'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Tên sản phẩm'),
-              ),
-              TextField(
-                controller: priceController,
-                decoration: const InputDecoration(labelText: 'Giá'),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: descController,
-                decoration: const InputDecoration(labelText: 'Mô tả'),
-              ),
-            ],
+          title: const Text('Sửa người dùng'),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'Tên người dùng'),
           ),
           actions: [
             TextButton(
@@ -175,13 +138,9 @@ class _ProductManagerScreenState extends State<ProductManagerScreen> {
             TextButton(
               onPressed: () {
                 final name = nameController.text;
-                final price = double.tryParse(priceController.text) ?? 0;
-                final desc = descController.text;
                 if (name.isNotEmpty) {
                   widget.realm.write(() {
-                    product.name = name;
-                    product.price = price;
-                    product.description = desc.isNotEmpty ? desc : null;
+                    user.name = name;
                   });
                   Navigator.of(context).pop();
                 }
